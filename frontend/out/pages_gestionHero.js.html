@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/gestionHero.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/gestionHero.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from "react";
+//hooks to delete and update
+import useUpdate from "../customHooks/useUpdate";
+import useDelete from "../customHooks/useDelete";
+//get current logged user
+import { getUser } from "../context/slice/userSlice";
+//methods form redux toolkit
+import { useSelector, useDispatch } from "react-redux";
+//extraReducer from redux store
+import { deleteHero } from "../context/slice/heroesSlice";
+//reducer from reduc store
+import { selectAllHeroes } from "../context/slice/heroesSlice";
+//components from material ui
+import { DataGrid } from "@mui/x-data-grid/DataGrid";
+import { Button, Modal } from "@mui/material";
+//components for handle delete and update
+import DeleteHero from "../components/ManageHeroes/deleteHero";
+import UpdateHero from "../components/ManageHeroes/updateHero";
+
+/**
+ * @constant 
+ * @type {View}
+ * @returns Rendered gestion heroes
+ */
+const GestionHeroes = () => {
+
+    /**
+     * @constant
+     * @type {object}
+     * @default [null]
+     */
+    const user = useSelector(getUser);
+
+    /**
+     * @funtion
+     * @type {Array}
+     * @default []
+     */
+    const data = useSelector(selectAllHeroes);
+
+    /**
+     * @function [dispatch]
+     * dispatch actions/reducers from redux store
+     */
+    const dispatch = useDispatch();
+
+    /**
+     * 
+     */
+    const { heroData, openUP, setButtonId, setOpenUP } = useUpdate(data);
+
+    /**
+     * @method
+     * @returns set boolean to false to close update modal
+     */
+    const handleCloseUP = () => setOpenUP(false);
+    
+    //delete
+    const { openDEL, buttonDel, setButtonDel, setOpenDEL } = useDelete()
+
+    /**
+     * @method
+     * @returns set boolean to false to close delete modal
+     */
+    const handleCloseDEL = () => setOpenDEL(false);
+
+    /**
+     * @method
+     * dispatch method to delete target hero and close modal (setTimeout)
+     */
+    const handleDelete = () => {
+        const data = {
+            id: buttonDel,
+            token: user.user.token
+        }
+        dispatch(deleteHero(data));
+
+        setTimeout(() => {
+            setOpenDEL(false);
+        }, 2000);
+    };
+
+    /**
+     * @constant
+     * @type {Array}
+     * Structure the columns
+     */
+    const columns = [
+        {
+            field: "_id", headerName: "ID"
+        },
+        {
+            field: "name", headerName: "Name"
+        },
+        {
+            field: "skill", headerName: "Skill", width: 450
+        },
+        {
+            field: "healthPoints", headerName: "HealthPoint"
+        },
+        {
+            field: "damage", headerName: "Damage"
+        },
+        {
+            field: "defense", headerName: "Defense"
+        },
+        {
+            field: "speed", headerName: "Speed"
+        },
+        {
+            field: "level", headerName: "Level"
+        },
+        {
+            field: "gold", headerName: "Gold"
+        },
+        {
+            field: "weapons", headerName: "Weapons", width: 250
+        },
+        {
+            field: "delete", headerName: "Kill", renderCell: (props) => {
+                return &lt;Button component="button" className="addEvent" variant="contained" size="small" value={ props.id } onClick={(e) => setButtonDel(e.target.value)}>Kill&lt;/Button>
+            }
+        },
+        {
+            field: "update", headerName: "Update", renderCell: (props) => {
+                return &lt;Button value={ props.id } component="button" className="addEvent" variant="contained" size="small" sx={{ backgroundColor: "green" }} onClick={(e) => setButtonId(e.target.value)}>Update&lt;/Button>
+            }
+        }
+    ];
+
+    return ( 
+        &lt;div className="gestionHeroes" style={{ width: "100%", height: "100%" }}>
+            &lt;DataGrid
+            rows={data}
+            columns={columns}
+            getRowId={(row) => row._id}
+            disableSelectionOnClick={true}
+            disableColumnMenu={true}
+            sx={{ border: "3px solid black", backgroundColor: "rgba(0, 0, 0, 0.9)", width: "95vw", height: "80vh", marginTop: "4rem", marginLeft: "2.5rem", padding: "1rem" }}
+            />
+            &lt;Modal
+            open={openDEL}
+            onClose={handleCloseDEL}
+            disableEscapeKeyDown={true}
+            hideBackdrop={true}
+            >
+                &lt;div>
+                &lt;DeleteHero>
+                    &lt;Button component="button" variant="contained" size="small" color="primary" onClick={handleDelete}> kill&lt;/Button>
+                    &lt;Button component="button" variant="contained" size="small" color="success" onClick={handleCloseDEL}> Go Back&lt;/Button>
+                &lt;/DeleteHero> 
+                &lt;/div>
+            &lt;/Modal>
+            &lt;Modal
+            open={openUP}
+            onClose={handleCloseUP}
+            disableEscapeKeyDown={true}
+            hideBackdrop={true}
+            >
+                &lt;div>
+                    &lt;UpdateHero heroData={heroData} fn={handleCloseUP} />
+                &lt;/div>
+            &lt;/Modal>
+        &lt;/div>
+    );
+}
+ 
+export default GestionHeroes;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#%255BApp%255D">[App]</a></li><li><a href="global.html#%255Bdispatch%255Ddispatchactions/reducersfromreduxstore">[dispatch]dispatch actions/reducers from redux store</a></li><li><a href="global.html#%255BFormsUser%255D">[FormsUser]</a></li><li><a href="global.html#%255BgetCredentials%255D">[getCredentials]</a></li><li><a href="global.html#%255BhandleChange%255D">[handleChange]</a></li><li><a href="global.html#%255BhandleSubmit%255D">[handleSubmit]</a></li><li><a href="global.html#%255BpostUserCreate%255D">[postUserCreate]</a></li><li><a href="global.html#CardCreate">CardCreate</a></li><li><a href="global.html#CardHeroes">CardHeroes</a></li><li><a href="global.html#Configuration">Configuration</a></li><li><a href="global.html#CreateHero">CreateHero</a></li><li><a href="global.html#DeleteHero">DeleteHero</a></li><li><a href="global.html#deleteHero">deleteHero</a></li><li><a href="global.html#dispatchmethodtodeletetargetheroandclosemodalsetTimeout">dispatch method to delete target hero and close modal </a></li><li><a href="global.html#fetchHeroes">fetchHeroes</a></li><li><a href="global.html#fetchPostHeroes">fetchPostHeroes</a></li><li><a href="global.html#filterHeroes">filterHeroes</a></li><li><a href="global.html#FormCreateHero">FormCreateHero</a></li><li><a href="global.html#formReducer">formReducer</a></li><li><a href="global.html#GestionHeroes">GestionHeroes</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getpathnamefromurltoswitchregisterorloginform">get pathname from url to switch register or login form</a></li><li><a href="global.html#heroesSlice">heroesSlice</a></li><li><a href="global.html#HeroesStore">HeroesStore</a></li><li><a href="global.html#HomePage">HomePage</a></li><li><a href="global.html#initialState">initialState</a></li><li><a href="global.html#initialValues">initialValues</a></li><li><a href="global.html#initialValuesUser">initialValuesUser</a></li><li><a href="global.html#isLoading">isLoading</a></li><li><a href="global.html#LoadingAndError">LoadingAndError</a></li><li><a href="global.html#loggedUser">loggedUser</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#MainNavbar">MainNavbar</a></li><li><a href="global.html#PATH_ROUTES">PATH_ROUTES</a></li><li><a href="global.html#post">post</a></li><li><a href="global.html#register">register</a></li><li><a href="global.html#remove">remove</a></li><li><a href="global.html#RenderHeroes">RenderHeroes</a></li><li><a href="global.html#selectAllHeroes">selectAllHeroes</a></li><li><a href="global.html#selectHeroesById">selectHeroesById</a></li><li><a href="global.html#theme">theme</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#UpdateHero">UpdateHero</a></li><li><a href="global.html#updateHero">updateHero</a></li><li><a href="global.html#useDelete">useDelete</a></li><li><a href="global.html#useFetch">useFetch</a></li><li><a href="global.html#useFetchUser">useFetchUser</a></li><li><a href="global.html#useGetProps">useGetProps</a></li><li><a href="global.html#userSlice">userSlice</a></li><li><a href="global.html#useSearch">useSearch</a></li><li><a href="global.html#useUpdate">useUpdate</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Sun Jul 10 2022 19:11:11 GMT+0200 (hora de verano de Europa central)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
